@@ -1,7 +1,7 @@
 {
-  "name": "waf-bypass-crawler",
+  "name": "databridge-crawler",
   "version": "1.0.0",
-  "description": "AI Agent Skill to bypass WAF/Cloudflare and extract dynamically loaded web data using Puppeteer with stealth mode",
+  "description": "DataBridge Crawler — stealth web scraper that bypasses WAF/Cloudflare. Captures raw HTML for the DataBridge pipeline. Chains with databridge-purifier for clean Markdown output.",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",

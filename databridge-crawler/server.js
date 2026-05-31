@@ -77,7 +77,7 @@ app.use((err, req, res, next) => {
 app.listen(config.PORT, () => {
   console.log(`
 ========================================
-  WAF Bypass Crawler API
+  DataBridge Crawler — Stage 1/2 (Capture)
   Server running on http://localhost:${config.PORT}
   
   Endpoints:
