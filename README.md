@@ -11,6 +11,7 @@
 
 | Skill | Type | Description | Status |
 |-------|------|-------------|--------|
+| [databridge-vault](./databridge-vault) | Infrastructure | Proxy rotation (round-robin) + session cookie vault with heartbeat keep-alive. Sidecar for the scraping pipeline. | ✅ Stable |
 | [databridge-crawler](./databridge-crawler) | Standalone Server | Stealth web scraper that bypasses WAF/Cloudflare protections using Puppeteer + stealth plugins | ✅ Stable |
 | [databridge-purifier](./databridge-purifier) | Standalone Server | Converts dirty HTML to clean, RAG-ready Markdown by stripping noise (nav, footer, ads, scripts) | ✅ Stable |
 
@@ -21,11 +22,11 @@
 Skills are designed to chain together via standard HTTP APIs:
 
 ```
-databridge-crawler (port 3000)            databridge-purifier (port 3001)
-  ┌──────────────────────┐               ┌──────────────────────────────┐
-  │ Stage 1: Capture     │── HTML ───▶  │ Stage 2: Clean               │──▶ LLM / RAG / Database
-  │ Bypass WAF/Cloudflare │              │ Strip noise → Clean Markdown │
-  └──────────────────────┘               └──────────────────────────────┘
+databridge-vault (port 3002)                     databridge-crawler (3000)         databridge-purifier (3001)
+  ┌──────────────────────────┐                    ┌──────────────────────┐         ┌──────────────────────┐
+  │ Infrastructure           │── proxy + cookies →│ Stage 1: Capture     │── HTML →│ Stage 2: Clean       │──▶ LLM / RAG
+  │ Proxy Rotation + Session │                    │ Bypass WAF/Cloudflare │         │ Strip noise → Markdown│
+  └──────────────────────────┘                    └──────────────────────┘         └──────────────────────┘
 ```
 
 ---
@@ -39,6 +40,7 @@ productivity-skills/
 ├── LICENSE                          # MIT License
 ├── CONTRIBUTING.md                  # Contribution guidelines
 ├── _template/                       # Skill template for new additions
+├── databridge-vault/                # Infrastructure: proxy + session
 ├── databridge-crawler/              # Stage 1: Stealth web scraper
 └── databridge-purifier/             # Stage 2: HTML → Markdown cleaner
 ```
@@ -63,12 +65,16 @@ Each skill in this collection is:
 Each skill is self-contained. Pick one and go:
 
 ```bash
-# Skill 1: DataBridge Crawler
+# Infrastructure: DataBridge Vault
+cd databridge-vault
+npm install && npm start
+
+# Stage 1: DataBridge Crawler
 cd databridge-crawler
 npm install && npx puppeteer browsers install chrome
 npm start
 
-# Skill 2: DataBridge Purifier
+# Stage 2: DataBridge Purifier
 cd databridge-purifier
 npm install && npm start
 ```

@@ -4,6 +4,23 @@ This is a monorepo of productivity tools and Claude Code slash-command skills. E
 
 ## Available Skills
 
+### databridge-vault
+- **Type:** Standalone Express server (Infrastructure)
+- **What it does:** Proxy rotation (round-robin) + session cookie vault with heartbeat keep-alive. Sidecar that feeds databridge-crawler with fresh IPs and login sessions.
+- **How to run:** `cd databridge-vault && npm start`
+- **Server:** `http://localhost:3002`
+- **Endpoints:**
+  - `GET /health` — Health check with pool stats
+  - `POST /api/proxy/add` — Add proxy to rotation pool
+  - `GET /api/proxy/list` — List all proxies
+  - `DELETE /api/proxy/remove` — Remove a proxy
+  - `POST /api/session/inject` — Inject cookies + keep-alive URL for a domain
+  - `GET /api/session/list` — List all sessions with status
+  - `GET /api/session/status?domain=X` — Check session for domain
+  - `POST /api/session/heartbeat` — Trigger manual heartbeat
+  - `GET /api/vault/next` — Next proxy + best active session (composite)
+- **When to use:** Before scraping — call `/api/vault/next` to get a rotating IP + valid session cookie
+
 ### databridge-crawler
 - **Type:** Standalone Express server
 - **What it does:** Stealthily scrapes web pages behind WAF/Cloudflare protections using Puppeteer + stealth plugins
@@ -23,7 +40,7 @@ This is a monorepo of productivity tools and Claude Code slash-command skills. E
   - `GET /health` — Health check
   - `POST /api/convert` — Convert HTML (raw or from URL) to clean Markdown
 - **When to use:** After scraping a webpage with databridge-crawler, before feeding to LLM/RAG
-- **Pipeline:** `databridge-crawler (port 3000) → databridge-purifier (port 3001) → LLM/RAG`
+- **Pipeline:** `databridge-vault (port 3002) → databridge-crawler (port 3000) → databridge-purifier (port 3001) → LLM/RAG`
 
 ## Adding a New Skill
 

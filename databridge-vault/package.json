@@ -1,0 +1,27 @@
+{
+  "name": "databridge-vault",
+  "version": "1.0.0",
+  "description": "DataBridge Vault — proxy rotation (round-robin) + session cookie vault with heartbeat keep-alive. Infrastructure layer for the DataBridge scraping pipeline.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "test": "node test.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "axios": "^1.6.5",
+    "dotenv": "^16.3.1",
+    "cors": "^2.8.5"
+  },
+  "keywords": [
+    "proxy-rotation",
+    "round-robin",
+    "session-management",
+    "cookie-vault",
+    "heartbeat",
+    "keep-alive",
+    "databridge",
+    "web-scraping"
+  ],
+  "license": "MIT"
+}
