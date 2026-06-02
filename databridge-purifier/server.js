@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors');
+const helmet = require('helmet');
 const axios = require('axios');
 const { Purifier } = require('./purifier');
 const { validateInput, createErrorResponse, PurifierError, ERROR_CODES } = require('./errorHandler');
@@ -8,6 +9,7 @@ const config = require('./config');
 const app = express();
 const purifier = new Purifier();
 
+app.use(helmet());
 app.use(cors());
 app.use(express.json({
   limit: `${Math.ceil(config.MAX_INPUT_SIZE / 1024 / 1024)}mb`,
@@ -15,7 +17,12 @@ app.use(express.json({
 
 // ─── Health Check ───────────────────────────────────────────────
 app.get('/health', (req, res) => {
-  res.json({ status: 'ok', timestamp: new Date().toISOString() });
+  res.json({
+    success: true,
+    status: 'ok',
+    timestamp: new Date().toISOString(),
+    stats: { engine: 'cheerio+turndown', tiers: 3 },
+  });
 });
 
 // ─── Convert HTML → Markdown ────────────────────────────────────
@@ -124,5 +131,9 @@ app.listen(config.PORT, () => {
 ========================================
   `);
 });
+
+// Graceful shutdown
+process.on('SIGTERM', () => process.exit(0));
+process.on('SIGINT', () => process.exit(0));
 
 module.exports = app;

@@ -71,7 +71,7 @@ class Purifier {
     // Step 9: Post-process — compact excessive blank lines
     markdown = this.compactBlankLines(markdown);
 
-    // Step 9: Build stats
+    // Step 10: Build stats
     const strippedTypes = {
       hardStripped: noiseStats.hardStripped,
       heuristicStripped: noiseStats.heuristicStripped,
@@ -126,11 +126,19 @@ class Purifier {
       replacement: (content) => content,
     });
 
-    // Strip image alt text if preserveImages is false
+    // Strip images if preserveImages is false
     if (!opts.preserveImages) {
       td.addRule('stripImages', {
         filter: 'img',
         replacement: () => '',
+      });
+    }
+
+    // Strip links if preserveLinks is false (keep link text, drop URL)
+    if (!opts.preserveLinks) {
+      td.addRule('stripLinks', {
+        filter: (node) => node.nodeName === 'A',
+        replacement: (content) => content,
       });
     }
 

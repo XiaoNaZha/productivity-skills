@@ -462,14 +462,30 @@ class VaultManager {
   /**
    * Composite: get next proxy + best active session.
    * Called by crawler before each scrape.
+   * @param {string} [domain] — optional: filter session by target domain
    * @returns {{ proxy: string|null, session: object|null }}
    */
-  next() {
+  next(domain) {
     const proxy = this.proxyPool.next();
     const activeSessions = this.sessionVault.getActive();
 
-    // Best session: prefer the first active one (or specific domain if we had filtering)
-    const session = activeSessions.length > 0 ? activeSessions[0] : null;
+    let session = null;
+
+    if (domain) {
+      // Try exact domain match first, then prefix match
+      const key = domain.toLowerCase();
+      session = activeSessions.find((s) => s.domain === key) || null;
+
+      if (!session) {
+        // Try matching as suffix (e.g., "news.ycombinator.com" matches "ycombinator.com")
+        session = activeSessions.find((s) => key.endsWith(s.domain)) || null;
+      }
+    }
+
+    // Fallback: first active session
+    if (!session) {
+      session = activeSessions.length > 0 ? activeSessions[0] : null;
+    }
 
     return { proxy, session };
   }

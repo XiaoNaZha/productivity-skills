@@ -2,9 +2,9 @@
   "name": "databridge-skill-name",
   "version": "1.0.0",
   "description": "DataBridge — brief description of the skill",
-  "main": "index.js",
+  "main": "server.js",
   "scripts": {
-    "start": "node index.js",
+    "start": "node server.js",
     "test": "node test.js"
   },
   "dependencies": {

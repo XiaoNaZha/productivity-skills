@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors');
+const helmet = require('helmet');
 const { VaultManager, VaultError, ERROR_CODES } = require('./vaultManager');
 const config = require('./config');
 
@@ -7,6 +8,7 @@ const app = express();
 const vault = new VaultManager();
 
 app.use(cors());
+app.use(helmet());
 app.use(express.json({ limit: '100kb' }));
 
 // ─── Health ────────────────────────────────────────────────────
@@ -176,12 +178,14 @@ app.post('/api/session/heartbeat', async (req, res) => {
  * Returns next proxy + best active session. Called by crawler before scraping.
  */
 app.get('/api/vault/next', (req, res) => {
-  const result = vault.next();
+  const { domain } = req.query;
+  const result = vault.next(domain);
   res.json({
     success: true,
     data: {
       proxy: result.proxy,
       session: result.session,
+      matchedDomain: !!domain,
       _hint: result.session
         ? 'Use proxy in crawler args, cookies in request headers'
         : 'No active session. Inject one via POST /api/session/inject',

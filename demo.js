@@ -133,12 +133,24 @@ async function stage2Crawler(vaultData) {
   const payload = {
     url: TARGET_URL,
     format: 'html',
-    waitFor: 2000, // extra wait for JS rendering
+    waitFor: 2000,
   };
 
+  // Inject vault credentials into crawler request
+  if (vaultData.proxy) {
+    payload.proxy = vaultData.proxy;
+  }
+  if (vaultData.session?.cookies) {
+    payload.cookies = vaultData.session.cookies;
+  }
+
+  const credSummary = [
+    vaultData.proxy ? 'proxy' : null,
+    vaultData.session?.cookies ? 'cookies' : null,
+  ].filter(Boolean).join(', ') || 'direct';
+
   console.log(`  → Target: ${TARGET_URL}`);
-  console.log(`  → Calling POST /api/extract ...`);
-  console.log(`  → Payload: { url, format: "html", waitFor: 2000 }`);
+  console.log(`  → Calling POST /api/extract with ${credSummary} ...`);
 
   const startTime = Date.now();
 
